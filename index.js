@@ -1,25 +1,27 @@
-const express = require('express')
-const {Pool} = require('pg')
-const app = express()
+const express = require("express");
+const pool = require('./query.js')
+const app = express();
 
-const pool = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'db_percobaan',
-    password: 'admin',
-    port: 5432,
-  })
+const port = 8000;
+app.listen(port, () => {
+  console.log("server berjalan di server: " + port);
+});
 
-  const port = 8000
-  app.listen(port, () => {
-      console.log('server berjalan di server: ' + port)
-  })
+app.get("/film", async (req, res) => {
+  try {
+    const result = await pool.query("select * from film");
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+  }
+});
 
-app.get('/actor', async (req, res) => {
-    try{
-        const result = await pool.query('select * from actor limit 50')
-        res.json(result.rows)
-    }catch (error) {
-        console.error(error)
-    }
-} )
+app.get("/film/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(`SELECT * FROM film WHERE film_id=${id} `);
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+  }
+});
